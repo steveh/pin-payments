@@ -63,7 +63,7 @@ module Pin
     attr_reader :api, :klass
 
     def api_path
-      "/#{klass.to_s.demodulize.underscore.pluralize}"
+      "/1/#{klass.to_s.demodulize.underscore.pluralize}"
     end
 
     def authenticated_post(url, params = nil)

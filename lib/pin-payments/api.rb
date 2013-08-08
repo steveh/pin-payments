@@ -21,7 +21,7 @@ module Pin
 
       @publishable_key = options[:publishable_key]
 
-      @connection = Faraday.new(url: "#{uri}/1") do |faraday|
+      @connection = Faraday.new(url: uri) do |faraday|
         # faraday.response :logger
         faraday.adapter Faraday.default_adapter
       end

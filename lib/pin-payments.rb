@@ -22,10 +22,12 @@ module Pin
     attr_reader :code, :error, :description, :response
 
     def initialize(response)
+      json = MultiJson.load(response.body)
+
       @code = response.status
-      @error = response['error']
-      @description = response['description']
-      @response = response
+      @error = json['error']
+      @description = json['description']
+      @response = json
     end
 
     def to_s
