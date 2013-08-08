@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    pin-payments (1.0)
+    pin-payments (2.0)
       faraday
       multi_json
 

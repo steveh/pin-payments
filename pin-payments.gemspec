@@ -4,12 +4,12 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
 Gem::Specification.new do |s|
   s.name        = 'pin-payments'
-  s.version     = '1.0'
-  s.date        = '2013-08-06'
+  s.version     = '2.0'
+  s.date        = '2013-08-08'
   s.summary     = "Pin Payments API wrapper"
   s.description = "A wrapper for the Pin Payments (https://pin.net.au/) API"
-  s.authors     = ["Alex Ghiculescu"]
-  s.email       = 'alexghiculescu@gmail.com'
+  s.authors     = ["Alex Ghiculescu", "Steve Hoeksema"]
+  s.email       = 'steve@thefold.co.nz'
 
   s.files         = `git ls-files`.split($/)
   s.executables   = s.files.grep(%r{^bin/}) { |f| File.basename(f) }
@@ -17,7 +17,7 @@ Gem::Specification.new do |s|
   s.require_paths = ["lib"]
 
   s.licenses    = ["MIT"]
-  s.homepage    = 'https://github.com/ghiculescu/pin-payments'
+  s.homepage    = 'https://github.com/steveh/pin-payments'
 
   s.add_dependency "faraday"
   s.add_dependency "multi_json"
