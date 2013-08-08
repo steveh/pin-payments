@@ -62,10 +62,10 @@ This allows you to inject `pin.yml` at deployment time, so that the secret key c
 
 ### Usage
 
-You'll probably want to create a form through which users can enter their details. [Pin's guide](https://pin.net.au/docs/guides/payment-forms) will step you through this. The publishable key will be necessary and, if set, can be obtained by calling `Pin.publishable_key`. You can also ask the module for the path to the javascript for the configured mode:
+You'll probably want to create a form through which users can enter their details. [Pin's guide](https://pin.net.au/docs/guides/payment-forms) will step you through this. The publishable key will be necessary and, if set, can be obtained by calling `pinstance.publishable_key`. You can also ask the module for the path to the javascript for the configured mode:
 
 ```erb
-<%= javascript_include_tag Pin.js_url %>
+<%= javascript_include_tag pinstance.js_url %>
 ```
 
 Creating a charge is simple. In your controller:
@@ -81,7 +81,7 @@ end
 
 This will issue a once-off charge ([API](https://pin.net.au/docs/api/charges)).
 
-For a recurring charge, you may wish to create a customer record at Pin. To do this, either create a `Card` object first, then a corresponding `Customer` via the [API](https://pin.net.au/docs/api/customers); or use a `card_token` returned from `Pin.js` to create a customer. Note that in either case you may activate additional compliance provisions in Pin's [Terms & Conditions](https://pin.net.au/terms).
+For a recurring charge, you may wish to create a customer record at Pin. To do this, either create a `Card` object first, then a corresponding `Customer` via the [API](https://pin.net.au/docs/api/customers); or use a `card_token` returned from `pin.js` to create a customer. Note that in either case you may activate additional compliance provisions in Pin's [Terms & Conditions](https://pin.net.au/terms).
 
 ```ruby
 # this doesn't contact the API
@@ -107,7 +107,7 @@ customer = customers.find {|c| c.email == current_user.email}
 
 # create a charge for the customer
 # note that using this method you will need to store the `ip_address` of the user
-# generally you can store this from when you initially created the customer (via Pin.js)
+# generally you can store this from when you initially created the customer (via pin.js)
 pinstance.charges.create email: user.email, description: '1 month of service', amount: 19900,
                    currency: 'AUD', ip_address: user.ip_address, customer: customer
 ```
