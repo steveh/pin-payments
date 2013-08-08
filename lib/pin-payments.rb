@@ -1,5 +1,5 @@
-require 'httparty'
-require 'json'
+require 'faraday'
+require 'multi_json'
 
 require 'pin-payments/api'
 require 'pin-payments/response'
@@ -22,7 +22,7 @@ module Pin
     attr_reader :code, :error, :description, :response
 
     def initialize(response)
-      @code = response.code
+      @code = response.status
       @error = response['error']
       @description = response['description']
       @response = response

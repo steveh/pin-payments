@@ -19,7 +19,8 @@ Gem::Specification.new do |s|
   s.licenses    = ["MIT"]
   s.homepage    = 'https://github.com/ghiculescu/pin-payments'
 
-  s.add_dependency "httparty"
+  s.add_dependency "faraday"
+  s.add_dependency "multi_json"
 
   s.add_development_dependency "bundler", "~> 1.3"
   s.add_development_dependency "webmock"

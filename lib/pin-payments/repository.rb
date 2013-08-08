@@ -1,13 +1,10 @@
 module Pin
   class Repository
 
-    include HTTParty
-
     def initialize(api)
       @api = api
-      @klass = self.class.to_s.gsub(/Repository$/, "").constantize
 
-      self.class.base_uri api.base_uri
+      @klass = self.class.to_s.gsub(/Repository$/, "").constantize
     end
 
     def build(attributes = {})
@@ -17,7 +14,7 @@ module Pin
     def create(options, path = api_path)
       response = authenticated_post(path, options)
 
-      if response.code == 201 # object created
+      if response.status == 201 # object created
         build_instance_from_response(response)
       else
         raise Pin::APIError.new(response)
@@ -27,7 +24,14 @@ module Pin
     def all(options = {})
       options = {path: api_path, page: 1}.merge(options)
       paging = "page=#{options[:page]}" unless options[:page] == 1
-      build_collection_from_response(authenticated_get(options[:path], paging))
+
+      response = authenticated_get(options[:path], paging)
+
+      if response.status == 200
+        build_collection_from_response(response)
+      else
+        raise Pin::APIError.new(response)
+      end
     end
 
     def all_pages(options = {})
@@ -44,7 +48,14 @@ module Pin
 
     def find(token, options = {})
       options = options.merge(path: api_path)
-      build_instance_from_response(authenticated_get("#{options[:path]}/#{token}"))
+
+      response = authenticated_get("#{options[:path]}/#{token}")
+
+      if response.status == 200
+        build_instance_from_response(response)
+      else
+        raise Pin::APIError.new(response)
+      end
     end
 
   protected
@@ -55,31 +66,36 @@ module Pin
       "/#{klass.to_s.demodulize.underscore.pluralize}"
     end
 
-    def authenticated_post(url, body)
-      self.class.post(url, body: body, basic_auth: api.auth)
+    def authenticated_post(url, params = nil)
+      api.connection.post(url, params)
     end
 
-    def authenticated_get(url, query = nil)
-      self.class.get(url, query: query, basic_auth: api.auth)
+    def authenticated_get(url, params = nil)
+      api.connection.get(url, params)
     end
 
-    def build_instance(model)
-      klass.new(api, model)
+    def build_instance(record)
+      klass.new(api, record)
     end
 
     def build_instance_from_response(response)
-      build_instance(response.parsed_response['response'])
+      json = MultiJson.load(response.body)
+
+      data = json['response']
+
+      build_instance(data)
     end
 
     def build_collection_from_response(response)
-      models = []
-      if response.code == 200
-        response.parsed_response['response'].each do |model|
-          models << build_instance(model)
-        end
+      json = MultiJson.load(response.body)
+
+      records = json['response'].collect do |data|
+        build_instance(data)
       end
-      pg = response.parsed_response['pagination']
-      CollectionResponse.new(models, pg['per_page'], pg['pages'], pg['current'])
+
+      pg = json['pagination']
+
+      CollectionResponse.new(records, pg['per_page'], pg['pages'], pg['current'])
     end
 
   end

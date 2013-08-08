@@ -1,7 +1,7 @@
 module Pin
   class Api
 
-    attr_reader :base_uri, :js_url, :auth, :publishable_key
+    attr_reader :connection, :js_url, :publishable_key
 
     def initialize(options)
       raise ArgumentError, "Pin::Api.new wants an options hash" unless Hash === options
@@ -17,13 +17,16 @@ module Pin
           raise ArgumentError, "Incorrect API mode! Must be :live or :test"
       end
 
-      @base_uri = "#{uri}/1"
-
       @js_url = "#{uri}/pin.js"
 
-      @auth = { username: options[:secret_key], password: "" }
-
       @publishable_key = options[:publishable_key]
+
+      @connection = Faraday.new(url: "#{uri}/1") do |faraday|
+        # faraday.response :logger
+        faraday.adapter Faraday.default_adapter
+      end
+
+      @connection.basic_auth options[:secret_key], ""
     end
 
     def cards
