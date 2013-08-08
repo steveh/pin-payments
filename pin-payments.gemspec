@@ -20,7 +20,7 @@ Gem::Specification.new do |s|
   s.homepage    = 'https://github.com/steveh/pin-payments'
 
   s.add_dependency "faraday"
-  s.add_dependency "multi_json"
+  s.add_dependency "faraday_middleware"
 
   s.add_development_dependency "bundler", "~> 1.3"
   s.add_development_dependency "webmock"

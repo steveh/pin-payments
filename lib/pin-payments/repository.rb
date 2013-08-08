@@ -79,7 +79,7 @@ module Pin
     end
 
     def build_instance_from_response(response)
-      json = MultiJson.load(response.body)
+      json = response.body
 
       data = json['response']
 
@@ -87,7 +87,7 @@ module Pin
     end
 
     def build_collection_from_response(response)
-      json = MultiJson.load(response.body)
+      json = response.body
 
       records = json['response'].collect do |data|
         build_instance(data)

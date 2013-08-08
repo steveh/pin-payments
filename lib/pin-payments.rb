@@ -1,5 +1,4 @@
 require 'faraday'
-require 'multi_json'
 
 require 'pin-payments/api'
 require 'pin-payments/response'
@@ -22,7 +21,7 @@ module Pin
     attr_reader :code, :error, :description, :response
 
     def initialize(response)
-      json = MultiJson.load(response.body)
+      json = response.body
 
       @code = response.status
       @error = json['error']

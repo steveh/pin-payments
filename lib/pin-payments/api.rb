@@ -1,3 +1,6 @@
+require "faraday"
+require "faraday_middleware"
+
 module Pin
   class Api
 
@@ -22,7 +25,13 @@ module Pin
       @publishable_key = options[:publishable_key]
 
       @connection = Faraday.new(url: uri) do |faraday|
+        faraday.request :url_encoded
+
+        faraday.response :json
         # faraday.response :logger
+
+        faraday.use :instrumentation
+
         faraday.adapter Faraday.default_adapter
       end
 
