@@ -23,7 +23,7 @@ You'll need to create an account at [pin.net.au](https://pin.net.au/) first.
 Create an initializer, eg. `pin.rb`, using keys from Pin's [Your Account](https://dashboard.pin.net.au/account) page.
 
 ```ruby
-Pin.setup secret_key: 'PIN_SECRET_KEY', publishable_key: 'PIN_PUBLISHABLE_KEY', mode: :test
+pinstance = Pin::Api.new secret_key: 'PIN_SECRET_KEY', publishable_key: 'PIN_PUBLISHABLE_KEY', mode: :test
 ```
 
 The `mode` should be `:live` or `:test` depending on which API you want to access. The `publishable_key` is optional.
@@ -35,7 +35,7 @@ pin_config_path = Rails.root.join 'config', 'pin.yml'
 if File.exists?(pin_config_path)
   configuration = YAML.load_file(pin_config_path)
   raise "No environment configured for Pin for RAILS_ENV=#{Rails.env}" unless configuration[Rails.env]
-  Pin.setup configuration[Rails.env].symbolize_keys
+  pinstance = Pin::Api.new configuration[Rails.env].symbolize_keys
 end
 ```
 
@@ -72,7 +72,7 @@ Creating a charge is simple. In your controller:
 
 ```ruby
 def create
-  Pin::Charge.create email: 'user@example.com', description: '1 year of service', amount: 10000,
+  pinstance.charges.create email: 'user@example.com', description: '1 year of service', amount: 10000,
                      currency: 'AUD', ip_address: params[:ip_address], card_token: params[:card_token]
 
   redirect_to new_payment_path, notice: "Your credit card has been charged"
@@ -85,14 +85,14 @@ For a recurring charge, you may wish to create a customer record at Pin. To do t
 
 ```ruby
 # this doesn't contact the API
-card = Pin::Card.new number: '5520000000000000', expiry_month: '12', expiry_year: '2018', cvc: '123',
+card = pinstance.cards.build number: '5520000000000000', expiry_month: '12', expiry_year: '2018', cvc: '123',
                      name: 'User Name', address_line1: 'GPO Box 1234', address_city: 'Melbourne', address_postcode: '3001', address_state: 'VIC', address_country: 'Australia'
 
 # this contacts the API and returns a customer
-customer = Pin::Customer.create 'user@example.com', card
+customer = pinstance.customers.create 'user@example.com', card
 
 # this contacts the API and returns a charge
-Pin::Charge.create email: 'user@example.com', description: '1 year of service', amount: 10000,
+pinstance.charges.create email: 'user@example.com', description: '1 year of service', amount: 10000,
                    currency: 'AUD', ip_address: '127.0.0.1', customer: customer # shorthand for customer_token: customer.token
 ```
 
@@ -100,7 +100,7 @@ You can view your customers in the [Pin dashboard](https://dashboard.pin.net.au/
 
 ```ruby
 # get all customers from the API
-customers = Pin::Customer.all
+customers = pinstance.customers.all
 
 # find the customer you are trying to charge, assuming `current_user` is defined elsewhere
 customer = customers.find {|c| c.email == current_user.email}
@@ -108,7 +108,7 @@ customer = customers.find {|c| c.email == current_user.email}
 # create a charge for the customer
 # note that using this method you will need to store the `ip_address` of the user
 # generally you can store this from when you initially created the customer (via Pin.js)
-Pin::Charge.create email: user.email, description: '1 month of service', amount: 19900,
+pinstance.charges.create email: user.email, description: '1 month of service', amount: 19900,
                    currency: 'AUD', ip_address: user.ip_address, customer: customer
 ```
 
@@ -116,7 +116,7 @@ Errors from the API will result in a`Pin::APIError` exception being thrown:
 
 ```ruby
 begin
-  response = Pin::Charge.create( ... )
+  response = pinstance.charges.create( ... )
 rescue Pin::APIError => e
   redirect_to new_payment_path, flash: { error: "Charge failed: #{e.message}" }
 end
