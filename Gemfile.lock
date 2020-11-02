@@ -26,7 +26,7 @@ GEM
     minitest (4.7.5)
     multi_json (1.7.8)
     multipart-post (1.2.0)
-    rake (10.1.0)
+    rake (12.3.3)
     safe_yaml (0.9.5)
     thread_safe (0.1.2)
       atomic
